@@ -9,8 +9,9 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import tailwindStyles from "../index.css?inline";
+import supabase from "@/supabasCient";
 
-function Widget() {
+function Widget({ projectId }) {
   const [rating, setRating] = useState(3);
   const [submitted, setSubmitted] = useState(false);
 
@@ -20,14 +21,28 @@ function Widget() {
 
   const submit = async (e) => {
     e.preventDefault();
-    const form = e.target;
-    const data = {
-      p_user_name: form.name.value,
-      p_user_email: form.email.value,
-      p_message: form.feedback.value,
-      p_rating: rating,
-    };
-    console.log(data);
+    console.log("in this function");
+    try {
+      const form = e.target;
+      const data = {
+        p_project_id: parseInt(projectId),
+        p_user_name: form.name.value,
+        p_user_email: form.email.value,
+        p_message: form.feedback.value,
+        p_rating: parseInt(rating),
+      };
+      console.log("reached 1 ");
+
+      const { data: returnedData, error } = await supabase.rpc("add_feedback", {
+        arguments: data,
+      });
+      console.log("reached 2 ");
+      setSubmitted(true);
+      console.log(returnedData);
+      console.log(error);
+    } catch (error) {
+      console.log("error here ", error);
+    }
   };
 
   return (
